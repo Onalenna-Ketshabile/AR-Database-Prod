@@ -8,8 +8,8 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 dotenv.config();
 app.use(cors({
-    // origin: 'http://localhost:3000',// need to change this
-    // methods: ['GET', 'POST', 'PUT', 'DELETE'],
+     origin: 'http://10.0.0.104:3000',// need to change this
+     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // Enable credentials (cookies) in cross-origin requests
   }));
 app.use(express.json());
