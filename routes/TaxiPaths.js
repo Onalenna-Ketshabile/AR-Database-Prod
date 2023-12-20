@@ -5,8 +5,6 @@ const stringSimilarity = require("string-similarity");
 const { Op } = require("sequelize");
 const axios = require('axios');
 
-const API_KEY = "AIzaSyCTVLjYNpFVtv79ES8PLgHoWsOtJ_eyuhc";
-
 // Define the association between Route and TaxiRank
 Route.belongsTo(TaxiRank, {
     foreignKey: 'TaxiRankTwoID',
@@ -220,16 +218,32 @@ router.get('/nearby/:latitude/:longitude', async (req, res) => {
   
 // Helper function to fetch nearby places
 const getNearbyPlaces = async (latitude, longitude, type) => {
-    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&keyword=taxi%20rank&rankby=distance&type=${type}&key=${API_KEY}`;
-    
-    try {
-      const response = await axios.get(url);
-      return response.data.results.slice(0, 20); // Take the first 20 results
-    } catch (error) {
-      console.error(`Error fetching nearby ${type} places:`, error);
-      throw error;
+  try {
+    // Fetch the Google Maps API key from the server
+    const apiKeyResponse = await fetch('http://localhost:3001/apikeys/s');
+    const apiKeyData = await apiKeyResponse.json();
+
+    if (!apiKeyResponse.ok) {
+      throw new Error('Failed to fetch Google Maps API key');
     }
-  };
+
+    const apiKey = apiKeyData.apiKey;
+
+    // Make the API call to fetch nearby places using the obtained API key
+    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&keyword=taxi%20rank&rankby=distance&type=${type}&key=${apiKey}`;
+    const response = await axios.get(url);
+
+    if (!response.data || !response.data.results) {
+      throw new Error('Invalid response from Google Places API');
+    }
+
+    return response.data.results.slice(0, 20); // Take the first 20 results
+  } catch (error) {
+    console.error(`Error fetching nearby ${type} places:`, error);
+    throw error;
+  }
+};
+
   
   // Helper function to combine and sort results
   const combineResults = (transitStationResults, taxiStandResults, latitude, longitude) => {

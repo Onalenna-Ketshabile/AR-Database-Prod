@@ -8,7 +8,7 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 dotenv.config();
 app.use(cors({
-     origin: 'http://10.0.0.104:3000',// need to change this
+    origin: 'http://10.0.0.104:3000',// need to change this
      methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // Enable credentials (cookies) in cross-origin requests
   }));
@@ -34,10 +34,12 @@ const db = require('./models');
 const taxiRankRouter = require('./routes/TaxiRanks');
 const taxiPaths = require('./routes/TaxiPaths');
 const authentication = require('./routes/Authentication');
+const apikeys = require('./routes/APIKeys');
 
 app.use('/taxiranks', taxiRankRouter);
 app.use('/routes', taxiPaths);
 app.use('/authentication', authentication);
+app.use('/apikeys',apikeys);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
